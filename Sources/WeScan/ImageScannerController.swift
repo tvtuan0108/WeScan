@@ -60,7 +60,9 @@ public final class ImageScannerController: UINavigationController {
         return .portrait
     }
 
-    public required init(image: UIImage? = nil, delegate: ImageScannerControllerDelegate? = nil) {
+    public required init(image: UIImage? = nil,
+                         delegate: ImageScannerControllerDelegate? = nil,
+                         showPreview: Bool = false) {
         super.init(rootViewController: ScannerViewController())
 
         self.imageScannerDelegate = delegate
