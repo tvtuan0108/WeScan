@@ -34,7 +34,7 @@ final class EditScanViewController: UIViewController {
         let title = NSLocalizedString("wescan.edit.button.next",
                                       tableName: nil,
                                       bundle: Bundle(for: EditScanViewController.self),
-                                      value: "Next",
+                                      value: self.showPreview ? "Next" : "Done",
                                       comment: "A generic next button"
         )
         let button = UIBarButtonItem(title: title, style: .plain, target: self, action: #selector(pushReviewController))
@@ -64,12 +64,17 @@ final class EditScanViewController: UIViewController {
 
     private var quadViewWidthConstraint = NSLayoutConstraint()
     private var quadViewHeightConstraint = NSLayoutConstraint()
+    private let showPreview: Bool!
 
     // MARK: - Life Cycle
 
-    init(image: UIImage, quad: Quadrilateral?, rotateImage: Bool = true) {
+    init(image: UIImage, quad:
+         Quadrilateral?,
+         rotateImage: Bool = true,
+         showPreview: Bool = false) {
         self.image = rotateImage ? image.applyingPortraitOrientation() : image
         self.quad = quad ?? EditScanViewController.defaultQuad(forImage: image)
+        self.showPreview = showPreview
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -153,13 +158,13 @@ final class EditScanViewController: UIViewController {
 
     @objc func pushReviewController() {
         guard let quad = quadView.quad,
-            let ciImage = CIImage(image: image) else {
-                if let imageScannerController = navigationController as? ImageScannerController {
-                    let error = ImageScannerControllerError.ciImageCreation
-                    imageScannerController.imageScannerDelegate?.imageScannerController(imageScannerController, didFailWithError: error)
-                }
-                return
-        }
+                 let ciImage = CIImage(image: image),
+                 let imageScannerController = navigationController as? ImageScannerController else {
+               let error = ImageScannerControllerError.ciImageCreation
+               (navigationController as? ImageScannerController)?
+                   .imageScannerDelegate?.imageScannerController(navigationController as! ImageScannerController, didFailWithError: error)
+               return
+           }
         let cgOrientation = CGImagePropertyOrientation(image.imageOrientation)
         let orientedImage = ciImage.oriented(forExifOrientation: Int32(cgOrientation.rawValue))
         let scaledQuad = quad.scale(quadView.bounds.size, image.size)
@@ -187,10 +192,17 @@ final class EditScanViewController: UIViewController {
             croppedScan: ImageScannerScan(image: croppedImage),
             enhancedScan: enhancedScan
         )
+        if self.showPreview {
+            let reviewViewController = ReviewViewController(results: results)
+             navigationController?.pushViewController(reviewViewController, animated: true)
+        } else {
+            imageScannerController.imageScannerDelegate?
+                .imageScannerController(imageScannerController, didFinishScanningWithResults: results)
 
-        let reviewViewController = ReviewViewController(results: results)
-        navigationController?.pushViewController(reviewViewController, animated: true)
+        }
     }
+    
+    
 
     private func displayQuad() {
         let imageSize = image.size
