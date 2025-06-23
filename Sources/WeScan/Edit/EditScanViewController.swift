@@ -64,17 +64,21 @@ final class EditScanViewController: UIViewController {
 
     private var quadViewWidthConstraint = NSLayoutConstraint()
     private var quadViewHeightConstraint = NSLayoutConstraint()
-    private let showPreview: Bool!
+    private let showPreview: Bool
+    private let autoScanEnabled: Bool
+    private var hasAutoProcessed = false
 
     // MARK: - Life Cycle
 
     init(image: UIImage, quad:
          Quadrilateral?,
          rotateImage: Bool = true,
-         showPreview: Bool = false) {
+         showPreview: Bool = false,
+         autoScanEnabled: Bool = false) {
         self.image = rotateImage ? image.applyingPortraitOrientation() : image
         self.quad = quad ?? EditScanViewController.defaultQuad(forImage: image)
         self.showPreview = showPreview
+        self.autoScanEnabled = autoScanEnabled
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -111,6 +115,14 @@ final class EditScanViewController: UIViewController {
         super.viewDidLayoutSubviews()
         adjustQuadViewConstraints()
         displayQuad()
+        
+        // ✅ Auto confirm if enabled
+        if autoScanEnabled, !hasAutoProcessed {
+            hasAutoProcessed = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) { [weak self] in
+                self?.pushReviewController()
+            }
+        }
     }
 
     override public func viewWillDisappear(_ animated: Bool) {
