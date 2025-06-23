@@ -62,7 +62,8 @@ public final class ImageScannerController: UINavigationController {
 
     public required init(image: UIImage? = nil,
                          delegate: ImageScannerControllerDelegate? = nil,
-                         showPreview: Bool = false) {
+                         showPreview: Bool = false,
+                         autoScanEnabled: Bool = false) {
         super.init(rootViewController: ScannerViewController())
 
         self.imageScannerDelegate = delegate
@@ -80,7 +81,7 @@ public final class ImageScannerController: UINavigationController {
         if let image {
             detect(image: image) { [weak self] detectedQuad in
                 guard let self else { return }
-                let editViewController = EditScanViewController(image: image, quad: detectedQuad, rotateImage: false)
+                let editViewController = EditScanViewController(image: image, quad: detectedQuad, rotateImage: false, autoScanEnabled: autoScanEnabled)
                 self.setViewControllers([editViewController], animated: false)
             }
         }
