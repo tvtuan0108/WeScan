@@ -48,17 +48,17 @@ final class ZoomGestureController {
         self.previousPanPosition = position
         self.closestCorner = closestCorner
 
-        let scale = image.size.width / quadView.bounds.size.width
-        let scaledDraggedCornerViewCenter = CGPoint(x: draggedCornerViewCenter.x * scale, y: draggedCornerViewCenter.y * scale)
-        guard let zoomedImage = image.scaledImage(
-            atPoint: scaledDraggedCornerViewCenter,
-            scaleFactor: 2.5,
-            targetSize: quadView.bounds.size
-        ) else {
-            return
-        }
+//        let scale = image.size.width / quadView.bounds.size.width
+//        let scaledDraggedCornerViewCenter = CGPoint(x: draggedCornerViewCenter.x * scale, y: draggedCornerViewCenter.y * scale)
+//        guard let zoomedImage = image.scaledImage(
+//            atPoint: scaledDraggedCornerViewCenter,
+//            scaleFactor: 2.5,
+//            targetSize: quadView.bounds.size
+//        ) else {
+//            return
+//        }
 
-        quadView.highlightCornerAtPosition(position: closestCorner, with: zoomedImage)
+//        quadView.highlightCornerAtPosition(position: closestCorner, with: zoomedImage)
     }
 
 }
